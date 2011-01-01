@@ -16,17 +16,17 @@ public class HashMapCounterPersister implements CounterPersister{
 
     public Long persist(Counter counter, long newCounter) {
 
-        Long old = data.get(counter.getCounterName());
+        Long old = data.get(counter.getPersistCounterName());
 
         if ( old == null ) old = 0l;
 
-        data.put(counter.getCounterName(), old + newCounter);
+        data.put(counter.getPersistCounterName(), old + newCounter);
 
         return old + newCounter;
     }
 
     public Long getCounterValue(Counter counter) {
-        return data.get(counter.getCounterName());
+        return data.get(counter.getPersistCounterName());
     }
 
 }

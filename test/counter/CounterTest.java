@@ -24,7 +24,7 @@ public class CounterTest extends Assert {
         ca = new ConcurrentHashMapCacheAccessor();
         cp = new HashMapCounterPersister();
         counter = new Counter(
-                ca, cp, "counter", "counter", "a_counter"
+                ca, cp, "counter", "a_counter"
         );
     }
 
@@ -49,12 +49,12 @@ public class CounterTest extends Assert {
 
         counter.setMinAvailableTime(3);
 
-        for (int i = 0; i < counter.getThreshold() - 1; i++) {
+        for (int i = 0; i < counter.getFlushSize() - 1; i++) {
             Thread.sleep(counter.getMinAvailableTime() + 1);
             click(counter);
         }
 
-        assertEquals(counter.getThreshold() - 1, counter.getCacheCount().longValue());
+        assertEquals(counter.getFlushSize() - 1, counter.getCacheCount().longValue());
 
         assertNull(counter.getPersistCount());
 
@@ -82,12 +82,12 @@ public class CounterTest extends Assert {
         counter.setMinAvailableTime(0);
 
         counter.increase();//init counter cache
-        counter.increaseBy(counter.getThreshold());
+        counter.increaseBy(counter.getFlushSize());
 
         //cache should be 0
         assertEquals(0l, counter.getCacheCount().longValue());
         // and db should be threshold + 1
-        assertEquals(counter.getThreshold() + 1, counter.getPersistCount().longValue());
+        assertEquals(counter.getFlushSize() + 1, counter.getPersistCount().longValue());
 
     }
 

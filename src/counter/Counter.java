@@ -10,7 +10,7 @@ public class Counter {
     private CacheAccessor cacheAccessor;
     private CounterPersister counterPersister;
 
-    /** 该counter的名称，必须唯一 */
+    /** 该counter的名称，必须唯一, 用于决定缓存的key */
     private String name;
 
     /** 缓存中存贮上次修改时间的key */
@@ -23,24 +23,24 @@ public class Counter {
     private long expire;
 
     /** 缓存中的存贮点击量的最大值 */
-    private long threshold;
+    private long flushSize;
 
     /** 持久化点击量时的counter名称(例如 数据库表名称) */
-    private String counterName;
+    private String persistCounterName;
 
     /** 持久化点击量时，点击量所在列的名称(例如 数据库列名称) */
-    private String counterValueName;
+    private String persistCounterValueName;
 
-    public Counter(CacheAccessor cacheAccessor, CounterPersister counterPersister, String name, String counterName, String databaseColumnName) {
+    public Counter(CacheAccessor cacheAccessor, CounterPersister counterPersister, String persistCounterName, String counterValueName) {
         this.cacheAccessor = cacheAccessor;
         this.counterPersister = counterPersister;
-        this.name = name;
-        this.counterName = counterName;
-        this.counterValueName = databaseColumnName;
+        this.name = persistCounterName + "#" + counterValueName;
+        this.persistCounterName = this.persistCounterName;
+        this.persistCounterValueName = counterValueName;
 
         this.lastModifiedKey = "lastModified_" + name;
         this.minAvailableTime = 1000;
-        this.threshold = 15;
+        this.flushSize = 15;
     }
 
     public Long getCacheCount() {
@@ -64,8 +64,8 @@ public class Counter {
         this.name = name;
         this.lastModifiedKey = lastModifiedKey;
         this.minAvailableTime = minAvailableTime;
-        this.counterName = counterName;
-        this.counterValueName = databaseColumnName;
+        this.persistCounterName = counterName;
+        this.persistCounterValueName = databaseColumnName;
     }
 
     public synchronized Long increaseBy(long n) {
@@ -122,7 +122,7 @@ public class Counter {
     }
 
     private boolean needFlush(Long counter) {
-        return counter >= threshold;
+        return counter >= flushSize;
     }
 
     private boolean available() {
@@ -188,27 +188,27 @@ public class Counter {
         this.expire = expire;
     }
 
-    public long getThreshold() {
-        return threshold;
+    public long getFlushSize() {
+        return flushSize;
     }
 
-    public void setThreshold(long threshold) {
-        this.threshold = threshold;
+    public void setFlushSize(long flushSize) {
+        this.flushSize = flushSize;
     }
 
-    public String getCounterName() {
-        return counterName;
+    public String getPersistCounterName() {
+        return persistCounterName;
     }
 
-    public void setCounterName(String counterName) {
-        this.counterName = counterName;
+    public void setPersistCounterName(String persistCounterName) {
+        this.persistCounterName = persistCounterName;
     }
 
-    public String getCounterValueName() {
-        return counterValueName;
+    public String getPersistCounterValueName() {
+        return persistCounterValueName;
     }
 
-    public void setCounterValueName(String counterValueName) {
-        this.counterValueName = counterValueName;
+    public void setPersistCounterValueName(String persistCounterValueName) {
+        this.persistCounterValueName = persistCounterValueName;
     }
 }
